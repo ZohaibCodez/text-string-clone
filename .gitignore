@@ -1,0 +1,13 @@
+# === Binaries ===
+bin/
+*.exe
+*.out
+*.o
+*.obj
+*.dll
+*.so
+*.a
+
+# === IDE files ===
+.vscode/
+*.code-workspace

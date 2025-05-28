@@ -18,8 +18,8 @@ text::text(const text &other) : len(other.len), cap(other.cap)
 text::text(const text &tex, size_t pos, size_t npos)
 {
     if (pos > tex.len)
-        throw out_of_range("Substring Constructor out of Range.");
-    if (npos == -1 || pos + npos > tex.len)
+        throw std::out_of_range("Substring Constructor out of Range.");
+    if (npos == size_t(-1) || pos + npos > tex.len)
     {
         npos = tex.len - pos;
     }
@@ -51,7 +51,7 @@ text::text(const char *tex, size_t n) : len(n), cap(n + 1)
 text::text(size_t n, char c) : len(n), cap(n + 1)
 {
     data = new char[cap];
-    for (int i = 0; i < len; i++)
+    for (size_t i = 0; i < len; i++)
     {
         data[i] = c;
     }
@@ -69,7 +69,7 @@ text::text(const char *first, const char *last)
 }
 
 // Initializer List Constructor
-text::text(initializer_list<char> il) : len(il.size()), cap(il.size() + 1)
+text::text(std::initializer_list<char> il) : len(il.size()), cap(il.size() + 1)
 {
     data = new char[cap];
     int i = 0;
@@ -144,7 +144,7 @@ text &text::operator=(char c)
 }
 
 // Initializer List Assignment
-text &text::operator=(initializer_list<char> il)
+text &text::operator=(std::initializer_list<char> il)
 {
     delete[] data;
     len = il.size();
@@ -177,7 +177,7 @@ text &text::operator=(text &&other) noexcept
 
 void text::print() const
 {
-    cout << data << endl;
+    std::cout << data << std::endl;
 }
 
 // Capacity
@@ -194,7 +194,7 @@ size_t text::length() const noexcept
 
 size_t text::max_size() const noexcept
 {
-    return numeric_limits<size_t>::max() / sizeof(char) - 1;
+    return std::numeric_limits<size_t>::max() / sizeof(char) - 1;
 }
 
 void text::resize(size_t n)
@@ -280,14 +280,14 @@ const char &text::operator[](size_t pos) const
 char &text::at(size_t pos)
 {
     if (pos >= len)
-        throw out_of_range("Index Accessed is out of Range.");
+        throw std::out_of_range("Index Accessed is out of Range.");
     return data[pos];
 }
 
 const char &text::at(size_t pos) const
 {
     if (pos >= len)
-        throw out_of_range("Index Accessed is out of Range.");
+        throw std::out_of_range("Index Accessed is out of Range.");
     return data[pos];
 }
 
@@ -383,7 +383,7 @@ text &text::append(const char *s, size_t n)
 text &text::append(size_t n, char c)
 {
     reserve(len + n);
-    for (int i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
     {
         data[len + i] = c;
     }
@@ -514,7 +514,7 @@ text &text::insert(size_t pos, size_t n, char c)
         pos = len;
     reserve(len + n);
     memmove(data + pos + n, data + pos, len - pos);
-    for (int i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
     {
         data[pos + i] = c;
     }
@@ -689,7 +689,7 @@ void text::swap(text &x, text &y)
     std::swap(x.cap, y.cap);
 }
 
-istream &operator>>(istream &is, text &tex)
+std::istream &operator>>(std::istream &is, text &tex)
 {
     tex.clear();
     char buffer[1024];
@@ -702,13 +702,13 @@ istream &operator>>(istream &is, text &tex)
     return is;
 }
 
-ostream &operator<<(ostream &os, const text &tex)
+std::ostream &operator<<(std::ostream &os, const text &tex)
 {
     os << tex.data;
     return os;
 }
 
-istream &text::getline(istream &is, text &tex, char delim)
+std::istream &text::getline(std::istream &is, text &tex, char delim)
 {
     tex.clear();
     char ch;
@@ -719,7 +719,7 @@ istream &text::getline(istream &is, text &tex, char delim)
     return is;
 }
 
-istream &text::getline(istream &is, text &tex)
+std::istream &text::getline(std::istream &is, text &tex)
 {
     return getline(is, tex, '\n');
 }
@@ -732,7 +732,7 @@ const char *text::c_str() const
 size_t text::copy(char *s, size_t len, size_t pos) const
 {
     if (pos > len)
-        throw out_of_range("Copy Out Of Range.");
+        throw std::out_of_range("Copy Out Of Range.");
     size_t rlen = (len < (this->len - pos)) ? len : (this->len - pos);
     memcpy(s, this->data + pos, rlen);
     return rlen;
@@ -804,7 +804,7 @@ size_t text::rfind(const char *s, size_t pos, size_t n) const
 
     size_t start = (pos < (len - n)) ? pos : (len - n);
 
-    for (size_t i = start; i >= 0; i--)
+    for (size_t i = start;; i--)
     {
         bool match = true;
         for (size_t j = 0; j < n; j++)
@@ -827,7 +827,7 @@ size_t text::rfind(char c, size_t pos) const
     if (len == 0)
         return npos;
     size_t i = (pos < len) ? pos : (len - 1);
-    for (i; i >= 0; i--)
+    for (;; i--)
     {
         if (c == this->data[i])
         {
@@ -891,7 +891,7 @@ size_t text::find_last_of(const char *s, size_t pos, size_t n) const
     if (len == 0 || n == 0)
         return npos;
     size_t end = (pos < len) ? pos : (len - 1);
-    for (size_t i = end; i >= 0; i--)
+    for (size_t i = end;; i--)
     {
         for (size_t j = 0; j < n; j++)
         {
@@ -908,10 +908,10 @@ size_t text::find_last_of(char c, size_t pos) const
     return rfind(c, pos);
 }
 
-text text::substr(size_t pos , size_t n) const
+text text::substr(size_t pos, size_t n) const
 {
     if (pos > len)
-        throw out_of_range("substr pos out of range.");
+        throw std::out_of_range("substr pos out of range.");
     n = (n < (len - pos)) ? n : (len - pos);
     return text(data + pos, n);
 }
@@ -959,7 +959,7 @@ int text::compare(size_t pos, size_t n, const char *s) const
 int text::compare(size_t pos, size_t len, const char *s, size_t n) const
 {
     if (pos > this->len)
-        throw out_of_range("Out Of Range.");
+        throw std::out_of_range("Out Of Range.");
     if (len == npos || this->len < (len + pos))
         len = this->len - pos;
     size_t min_len = (len < n) ? len : n;
